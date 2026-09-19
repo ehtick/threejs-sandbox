@@ -49,6 +49,7 @@
 			import * as THREE from 'three';
 			import { WebGPURenderer, Line2NodeMaterial } from 'three/webgpu';
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+			import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { mergeGeometries, mergeVertices } from 'three/addons/utils/BufferGeometryUtils.js';
 			import dat from 'dat.gui';
@@ -522,7 +523,12 @@
 				models.CYLINDER = cylinder;
 
 				models.ROVER = null;
-				new GLTFLoader().load(
+				const gltfLoader = new GLTFLoader();
+				const dracoLoader = new DRACOLoader();
+				dracoLoader.setDecoderPath( import.meta.resolve( 'three/addons/' ) + 'libs/draco/' );
+				gltfLoader.setDRACOLoader( dracoLoader );
+				
+				gltfLoader.load(
 					'https://raw.githubusercontent.com/gkjohnson/3d-demo-data/heads/main/models/nasa-m2020/MER_static.glb',
 					gltf => {
 

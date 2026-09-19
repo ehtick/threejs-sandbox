@@ -1,10 +1,10 @@
 import { Color } from 'three';
 import { NodeMaterial } from 'three/webgpu';
 import {
-	uniform, float, Fn, attribute, dot, normalize, sign,
-	cameraProjectionMatrix, modelViewMatrix, vec4, vec2,
-	negate, positionLocal, select
+	uniform, Fn, attribute, cameraProjectionMatrix,
+	modelViewMatrix, vec4, positionLocal, select
 } from 'three/tsl';
+import { isSilhouetteEdge } from './helper.js';
 
 export class ConditionalEdgesNodeMaterial extends NodeMaterial {
 
@@ -53,17 +53,7 @@ export class ConditionalEdgesNodeMaterial extends NodeMaterial {
 			p0.divAssign( p0.w );
 			p1.divAssign( p1.w );
 
-			const dir = p1.xy.sub( p0.xy );
-			const norm = vec2( negate( dir.y ), dir.x );
-
-			const c0dir = c0.xy.sub( p1.xy );
-			const c1dir = c1.xy.sub( p1.xy );
-
-			const d0 = dot( normalize( norm ), normalize( c0dir ) );
-			const d1 = dot( normalize( norm ), normalize( c1dir ) );
-			const discardFlag = float( sign( d0 ).notEqual( sign( d1 ) ) );
-
-			return select( discardFlag.greaterThan( 0.5 ), c0, clipPos );
+			return select( isSilhouetteEdge( c0.xy, c1.xy, p0.xy, p1.xy ), clipPos, c0 );
 
 		} )();
 
